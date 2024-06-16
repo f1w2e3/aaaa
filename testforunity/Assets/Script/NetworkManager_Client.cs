@@ -7,60 +7,60 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using UnityEngine.UI;
-using System.Runtime.InteropServices;//¸¶¼£¸µÀ» À§ÇÑ ¾î¼Àºí¸®
+using System.Runtime.InteropServices;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 using DefineInfo;
 using static DefineData;
 
 public class NetworkManager_Client : MonoBehaviour
 {
-    //¾²·¹µå
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1
     private Thread tcpListenerThread;
 
-    //¼ÒÄÏ
+    //ï¿½ï¿½ï¿½ï¿½
     private TcpClient socketConnection;
     private NetworkStream stream;
 
-    //»óÅÂ
+    //ï¿½ï¿½ï¿½ï¿½
     private bool clientReady;
 
     //ip, port
     public string ip;
     public int port;
 
-    //·Î±×
+    //ï¿½Î±ï¿½
     public Text ClientLog;
     private List<string> logList;
-    //Àü¼Û ¸Þ½ÃÁö
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½
     public GameObject Text_Input;
 
-    //¼­¹ö ±â´É UI
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ UI
     public GameObject ButtonServerOpen;
     public GameObject ButtonServerClose;
 
-    //¹ÞÀº µ¥ÀÌÅÍ ÀúÀå°ø°£
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     byte[] buffer;
-    //¹ÞÀº µ¥ÀÌÅÍ°¡ Àß¸± °æ¿ì¸¦ ´ëºñÇÏ¿© ÀÓ½Ã¹öÆÛ¿¡ ÀúÀåÇÏ¿© °ü¸®
-    byte[] tempBuffer;//ÀÓ½Ã¹öÆÛ
-    bool isTempByte;//ÀÓ½Ã¹öÆÛ À¯¹«
-    int nTempByteSize;//ÀÓ½Ã¹öÆÛÀÇ Å©±â
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ß¸ï¿½ ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½Ó½Ã¹ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+    byte[] tempBuffer;//ï¿½Ó½Ã¹ï¿½ï¿½ï¿½
+    bool isTempByte;//ï¿½Ó½Ã¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    int nTempByteSize;//ï¿½Ó½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
 
-    //º¸³»´Â ¸Þ½ÃÁö ÀúÀå°ø°£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     byte[] sendMessage = new byte[1024];
     bool bChangeMyName = false;
     
-    // Å¬¶óÀÌ¾ðÆ®¸í(ID)
+    // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½(ID)
     string strRcvMyName = "";
     
     // Start is called before the first frame update
     void Start()
     {
-        //·Î±× ÃÊ±âÈ­
+        //ï¿½Î±ï¿½ ï¿½Ê±ï¿½È­
         logList = new List<string>();
 
-        //¹ÞÀº µ¥ÀÌÅÍ ÀúÀå°ø°£ ÃÊ±âÈ­
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         buffer = new byte[1024];
-        //ÀÓ½Ã¹öÆÛ ÃÊ±âÈ­
+        //ï¿½Ó½Ã¹ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         tempBuffer = new byte[1024];
         isTempByte = false;
         nTempByteSize = 0;
@@ -69,10 +69,10 @@ public class NetworkManager_Client : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //·Î±×¸®½ºÆ®¿¡ ½×¿´´Ù¸é
+        //ï¿½Î±×¸ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½×¿ï¿½ï¿½Ù¸ï¿½
         if (logList.Count > 0)
         {
-            //¹èÃâ
+            //ï¿½ï¿½ï¿½ï¿½
             WriteLog(logList[0]);
             logList.RemoveAt(0);
         }
@@ -83,84 +83,84 @@ public class NetworkManager_Client : MonoBehaviour
             GameObject.Find("Text_Name").GetComponent<InputField>().text = strRcvMyName;
         }
 
-        //Å¬¶óÀÌ¾ðÆ® »óÅÂ¿¡ µû¶ó ¼­¹ö ¹öÆ° È°¼ºÈ­/ºñÈ°¼ºÈ­
+        //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­/ï¿½ï¿½È°ï¿½ï¿½È­
         ButtonServerOpen.SetActive(!clientReady);
         ButtonServerClose.SetActive(!clientReady);
     }
 
     /// <summary>
-    /// ¼­¹ö ¿¬°á
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public void ConnectToTcpServer()
     {
-        //ip, port ¼³Á¤
+        //ip, port ï¿½ï¿½ï¿½ï¿½
         ip = GameObject.Find("Text_IP").GetComponent<InputField>().text;
         port = int.Parse(GameObject.Find("Text_Port").GetComponent<InputField>().text);
 
-        // TCPÅ¬¶óÀÌ¾ðÆ® ½º·¹µå ½ÃÀÛ
+        // TCPÅ¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequeset));
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
     }
 
     /// <summary>
-    /// TCPÅ¬¶óÀÌ¾ðÆ® ¾²·¹µå
+    /// TCPÅ¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     private void ListenForIncommingRequeset()
     {
         try
         {
-            //¿¬°á
+            //ï¿½ï¿½ï¿½ï¿½
             socketConnection = new TcpClient(ip, port);
             stream = socketConnection.GetStream();
             clientReady = true;
 
-            //·Î±× ±â·Ï
-            logList.Add("½Ã½ºÅÛ : ¼­¹ö ¿¬°á(ip:" + ip + "/port:" + port + ")");
+            //ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
+            logList.Add("ï¿½Ã½ï¿½ï¿½ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ip:" + ip + "/port:" + port + ")");
 
-            //µ¥ÀÌÅÍ ¸®½Ãºê Ç×½Ã ´ë±â
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ãºï¿½ ï¿½×½ï¿½ ï¿½ï¿½ï¿½
             while (true)
             {
-                //¿¬°á ²÷±è °¨Áö
+                //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 if (!IsConnected(socketConnection))
                 {
-                    //¿¬°á ÇØÁ¦
+                    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     DisConnect();
                     break;
                 }
 
-                //¿¬°á Áß
+                //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
                 if (clientReady)
                 {
-                    //¸Þ½ÃÁö°¡ µé¾î¿Ô´Ù¸é
+                    //ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ô´Ù¸ï¿½
                     if (stream.DataAvailable)
                     {
-                        //¸Þ½ÃÁö ÀúÀå °ø°£ ÃÊ±âÈ­
+                        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
                         Array.Clear(buffer, 0, buffer.Length);
 
-                        //¸Þ½ÃÁö¸¦ ÀÐ´Â´Ù.
+                        //ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð´Â´ï¿½.
                         int messageLength = stream.Read(buffer, 0, buffer.Length);
 
-                        //½ÇÁ¦ Ã³¸®ÇÏ´Â ¹öÆÛ
-                        byte[] pocessBuffer = new byte[messageLength + nTempByteSize];//Áö±Ý ÀÐ¾î¿Â ¸Þ½ÃÁö¿¡ ³²Àº ¸Þ½ÃÁöÀÇ »çÀÌÁî¸¦ ´õÇØ¼­ Ã³¸®ÇÒ ¹öÆÛ »ý¼º
-                        //³²¾Ò´ø ¸Þ½ÃÁö°¡ ÀÖ´Ù¸é
+                        //ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
+                        byte[] pocessBuffer = new byte[messageLength + nTempByteSize];//ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½î¸¦ ï¿½ï¿½ï¿½Ø¼ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                        //ï¿½ï¿½ï¿½Ò´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½
                         if (isTempByte)
                         {
-                            //¾Õ ºÎºÐ¿¡ ³²¾Ò´ø ¸Þ½ÃÁö º¹»ç
+                            //ï¿½ï¿½ ï¿½ÎºÐ¿ï¿½ ï¿½ï¿½ï¿½Ò´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                             Array.Copy(tempBuffer, 0, pocessBuffer, 0, nTempByteSize);
-                            //Áö±Ý ÀÐÀº ¸Þ½ÃÁö º¹»ç
+                            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                             Array.Copy(buffer, 0, pocessBuffer, nTempByteSize, messageLength);
                         }
                         else
                         {
-                            //³²¾Ò´ø ¸Þ½ÃÁö°¡ ¾øÀ¸¸é Áö±Ý ÀÐ¾î¿Â ¸Þ½ÃÁö¸¦ ÀúÀå
+                            //ï¿½ï¿½ï¿½Ò´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                             Array.Copy(buffer, 0, pocessBuffer, 0, messageLength);
                         }
 
-                        //Ã³¸®ÇØ¾ß ÇÏ´Â ¸Þ½ÃÁöÀÇ ±æÀÌ°¡ 0ÀÌ ¾Æ´Ï¶ó¸é
+                        //Ã³ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Ï´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ 0ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ï¿½
                         if (nTempByteSize + messageLength > 0)
                         {
-                            //¹ÞÀº ¸Þ½ÃÁö Ã³¸®
+                            //ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
                             OnIncomingData(pocessBuffer);
                         }
                     }
@@ -173,24 +173,24 @@ public class NetworkManager_Client : MonoBehaviour
                 }
                 else//socketReady == false
                 {
-                    //¿¬°á ÇØÁ¦½Ã
+                    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     break;
                 }
             }
         }
         catch (SocketException socketException)
         {
-            //·Î±× ±â·Ï
-            logList.Add("½Ã½ºÅÛ : ¼­¹ö ¿¬°á ½ÇÆÐ(ip:" + ip + "/port:" + port + ")");
+            //ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
+            logList.Add("ï¿½Ã½ï¿½ï¿½ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ip:" + ip + "/port:" + port + ")");
             logList.Add(socketException.ToString());
 
-            //Å¬¶óÀÌ¾ðÆ® ¿¬°á ½ÇÆÐ
+            //Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             clientReady = false;
         }
     }
 
     /// <summary>
-    /// Á¢¼Ó È®ÀÎ
+    /// ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     /// </summary>
     /// <param name="client"></param>
     /// <returns></returns>
@@ -221,48 +221,48 @@ public class NetworkManager_Client : MonoBehaviour
     }
 
     /// <summary>
-    /// ¹ÞÀº ¸Þ½ÃÁö Ã³¸®
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     /// </summary>
     /// <param name="data"></param>
     private void OnIncomingData(byte[] data)
     {
 
-        // µ¥ÀÌÅÍÀÇ Å©±â°¡ Çì´õÀÇ Å©±âº¸´Ùµµ ÀÛÀ¸¸é
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½â°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½âº¸ï¿½Ùµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (data.Length < Constants.HEADER_SIZE)
         {
-            Array.Copy(data, 0, tempBuffer, nTempByteSize, data.Length);     // ÀÓÁö ÀúÀå ¹öÆÛ¿¡ Áö±Ý ¸Þ½ÃÁö ÀúÀå
+            Array.Copy(data, 0, tempBuffer, nTempByteSize, data.Length);     // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             isTempByte = true;
             nTempByteSize += data.Length;
             return;
         }
 
 
-        //Çì´õºÎºÐ Àß¶ó³»±â(º¹»çÇÏ±â)
-        byte[] headerDataByte = new byte[Constants.HEADER_SIZE];// Çì´õ »çÀÌÁî´Â 6(ID:ushort + Size:int)
-        Array.Copy(data, 0, headerDataByte, 0, headerDataByte.Length);// Çì´õ »çÀÌÁî ¸¸Å­ µ¥ÀÌÅÍ º¹»ç
-        //Çì´õ µ¥ÀÌÅÍ ±¸Á¶Ã¼È­(¸¶¼£¸µ)
+        //ï¿½ï¿½ï¿½ï¿½Îºï¿½ ï¿½ß¶ó³»±ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½)
+        byte[] headerDataByte = new byte[Constants.HEADER_SIZE];// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 6(ID:ushort + Size:int)
+        Array.Copy(data, 0, headerDataByte, 0, headerDataByte.Length);// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        //ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼È­(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
         stHeader headerData = HeaderfromByte(headerDataByte);
 
 
-        // Çì´õÀÇ »çÀÌÁîº¸´Ù ³²Àº ¸Þ½ÃÁöÀÇ »çÀÌÁî°¡ ÀÛÀ¸¸é
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½îº¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (headerData.PacketSize > data.Length)
         {
-            Array.Copy(data, 0, tempBuffer, nTempByteSize, data.Length);     // ÀÓÁö ÀúÀå ¹öÆÛ¿¡ Áö±Ý ¸Þ½ÃÁö ÀúÀå
+            Array.Copy(data, 0, tempBuffer, nTempByteSize, data.Length);     // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             isTempByte = true;
             nTempByteSize += data.Length;
             return;
         }
 
-        //Çì´õÀÇ ¸Þ½ÃÁöÅ©±â¸¸Å­¸¸ ¸Þ½ÃÁö º¹»çÇÏ±â
-        byte[] msgData = new byte[headerData.PacketSize]; //ÆÐÅ¶ ºÐ¸®¸¦ À§ÇÑ ÇöÀç ÀÐÀº Çì´õÀÇ ÆÐÅ¶ »çÀÌÁî¸¸Å­ ¹öÆÛ »ý¼º
-        Array.Copy(data, 0, msgData, 0, headerData.PacketSize); //»ý¼ºµÈ ¹öÆÛ¿¡ ÆÐÅ¶ Á¤º¸ º¹»ç
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½Å©ï¿½â¸¸Å­ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
+        byte[] msgData = new byte[headerData.PacketSize]; //ï¿½ï¿½Å¶ ï¿½Ð¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ï¿½î¸¸Å­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        Array.Copy(data, 0, msgData, 0, headerData.PacketSize); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        //Çì´õÀÇ ¸Þ½ÃÁö°¡
-        if (headerData.MsgID == 0)// ³» Á¤º¸ È®ÀÎ ¸Þ½ÃÁö
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if (headerData.MsgID == 0)// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½
         {
             stChangeInfoMsg stChangeInfoMsgData = ChangeInfoMsgfromByte(msgData);
 
-            string strTmp = "³» Á¤º¸\n" +
+            string strTmp = "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½\n" +
             "Name : " + stChangeInfoMsgData.strClientName + "\n" +
             "Position_X : " + stChangeInfoMsgData.position[0].ToString() + "\n" +
             "Position_Y : " + stChangeInfoMsgData.position[1].ToString() + "\n" +
@@ -272,43 +272,43 @@ public class NetworkManager_Client : MonoBehaviour
             "Quaternion_Z : " + stChangeInfoMsgData.Quaternion[2].ToString() + "\n" +
             "Quaternion_W : " + stChangeInfoMsgData.Quaternion[3].ToString();
 
-            //¸Þ½ÃÁö ·Î±×¿¡ ±â·Ï
+            //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Î±×¿ï¿½ ï¿½ï¿½ï¿½
             logList.Add(headerData.sendClientName + " : \n" + strTmp);
         }
-        else if (headerData.MsgID == 2)//¸Þ½ÃÁö
+        else if (headerData.MsgID == 2)//ï¿½Þ½ï¿½ï¿½ï¿½
         {
             stSendMsg SendMsgInfo = SendMsgfromByte(msgData);
-            //¸Þ½ÃÁö ·Î±×¿¡ ±â·Ï
+            //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Î±×¿ï¿½ ï¿½ï¿½ï¿½
             logList.Add(headerData.sendClientName + " : " + SendMsgInfo.strSendMsg);
         }
-        else if (headerData.MsgID == 3)// Å¬¶óÀÌ¾ðÆ®¸í Á¤º¸
+        else if (headerData.MsgID == 3)// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         {
 
             bChangeMyName = true;
             strRcvMyName = headerData.sendClientName;
 
-            //¸Þ½ÃÁö ·Î±×¿¡ ±â·Ï
-            logList.Add(headerData.sendClientName + " : " + "³ÊÀÇ ÀÌ¸§Àº -> " + headerData.sendClientName);
+            //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Î±×¿ï¿½ ï¿½ï¿½ï¿½
+            logList.Add(headerData.sendClientName + " : " + "ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ -> " + headerData.sendClientName);
         }
-        else//½Äº°µÇÁö ¾ÊÀº ID
+        else//ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ID
         {
 
         }
 
-        // ¸ðµç ¸Þ½ÃÁö°¡ Ã³¸®µÇ¼­ ³²Àº ¸Þ½ÃÁö°¡ ¾øÀ» °æ¿ì 
+        // ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ç¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ 
         if (data.Length == msgData.Length)
         {
             isTempByte = false;
             nTempByteSize = 0;
         }
-        // ¸Þ½ÃÁö Ã³¸® ÈÄ ¸Þ½ÃÁö°¡ ³²¾ÆÀÖ´Â °æ¿ì
+        // ï¿½Þ½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
         else
         {
-            //ÀÓ½Ã ¹öÆÛ Ã»¼Ò
+            //ï¿½Ó½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã»ï¿½ï¿½
             Array.Clear(tempBuffer, 0, tempBuffer.Length);
 
-            //»ý¼ºµÈ ¹öÆÛ¿¡ ÆÐÅ¶ Á¤º¸ º¹»ç
-            Array.Copy(data, msgData.Length, tempBuffer, 0, data.Length - (msgData.Length));// ÀÓ½Ã ÀúÀå ¹öÆÛ¿¡ ³²Àº ¸Þ½ÃÁö ÀúÀå
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            Array.Copy(data, msgData.Length, tempBuffer, 0, data.Length - (msgData.Length));// ï¿½Ó½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             isTempByte = true;
             nTempByteSize += data.Length - (msgData.Length);
         }
@@ -316,34 +316,34 @@ public class NetworkManager_Client : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸Þ½ÃÁö Àü¼Û
+    /// ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public void Send()
     {
-        //¿¬°á»óÅÂ°¡ ¾Æ´Ñ °æ¿ì
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â°ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½
         if(socketConnection == null)
         {
             return;
         }
 
-        // Á¤º¸ º¯°æ ±¸Á¶Ã¼ ÃÊ±âÈ­
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½Ê±ï¿½È­
         stSendMsg stSendMsgInfo = new stSendMsg();
         string strSendMsg = Text_Input.GetComponent<InputField>().text;
 
-        //¸Þ½ÃÁö ÀÛ¼º
+        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½
         string name = GameObject.Find("Text_Name").GetComponent<InputField>().text;
 
         stSendMsgInfo.sendClientName = name;
-        stSendMsgInfo.MsgID = 2;//¸Þ½ÃÁö ID
-        stSendMsgInfo.PacketSize = (ushort)Marshal.SizeOf(stSendMsgInfo);//¸Þ½ÃÁö Å©±â
+        stSendMsgInfo.MsgID = 2;//ï¿½Þ½ï¿½ï¿½ï¿½ ID
+        stSendMsgInfo.PacketSize = (ushort)Marshal.SizeOf(stSendMsgInfo);//ï¿½Þ½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
         stSendMsgInfo.strSendMsg = strSendMsg;
 
-        //±¸Á¶Ã¼ ¹ÙÀÌÆ®È­ ¹× Àü¼Û
+        //ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½Æ®È­ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         SendMsg(GetSendMsgToByte(stSendMsgInfo));
     }
 
     /// <summary>
-    /// ·Î±× Àü½Ã
+    /// ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="message"></param>
     public void WriteLog(/*Time*/string message)
@@ -352,36 +352,36 @@ public class NetworkManager_Client : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿¬°á ÇØÁ¦
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public void DisConnect()
     {
-        //¹Ì ¿¬°á½Ã
+        //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
         if(socketConnection == null)
         {
             return;
         }
 
-        //·Î±× ±â·Ï
-        logList.Add("[½Ã½ºÅÛ] Å¬¶óÀÌ¾ðÆ® ¿¬°á ÇØÁ¦");
+        //ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
+        logList.Add("[ï¿½Ã½ï¿½ï¿½ï¿½] Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
 
-        //»óÅÂ ÃÊ±âÈ­
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         clientReady = false;
 
-        //stream ÃÊ±âÈ­
+        //stream ï¿½Ê±ï¿½È­
         stream.Close();
 
-        //¼ÒÄÏ ÃÊ±âÈ­
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         socketConnection.Close();
         socketConnection = null;
 
-        //¾²·¹µå ÃÊ±âÈ­
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         tcpListenerThread.Abort();
         tcpListenerThread = null;
     }
 
     /// <summary>
-    /// ¾îÇÃ Á¾·á½Ã
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     private void OnApplicationQuit()
     {
@@ -389,38 +389,38 @@ public class NetworkManager_Client : MonoBehaviour
     }
 
     /// <summary>
-    /// ³» Á¤º¸ È®ÀÎ
+    /// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     /// </summary>
     public void CheckMyInformation()
     {
-        //¸Þ½ÃÁö ÃÊ±âÈ­
+        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         sendMessage = new byte[1024];
 
-        // ³» Á¤º¸ È®ÀÎ ±¸Á¶Ã¼ ÃÊ±âÈ­
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½Ê±ï¿½È­
         stHeader stCheckInfoMsgData = new stHeader();
 
-        //¸Þ½ÃÁö ÀÛ¼º
+        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½
         string name = GameObject.Find("Text_Name").GetComponent<InputField>().text;
         stCheckInfoMsgData.sendClientName = name;
         stCheckInfoMsgData.MsgID = 0;
         stCheckInfoMsgData.PacketSize = (ushort)Marshal.SizeOf(stCheckInfoMsgData);
 
-        //±¸Á¶Ã¼ ¹ÙÀÌÆ®È­ ¹× Àü¼Û
+        //ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½Æ®È­ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         SendMsg(GetHeaderToByte(stCheckInfoMsgData));
     }
 
     /// <summary>
-    /// ³» Á¤º¸ º¯°æ
+    /// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public void ChangeMyInformation()
     {
-        //¸Þ½ÃÁö ÃÊ±âÈ­
+        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         sendMessage = new byte[1024];
 
-        // Á¤º¸ º¯°æ ±¸Á¶Ã¼ ÃÊ±âÈ­
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½Ê±ï¿½È­
         stChangeInfoMsg stChangeInfoMsgData = new stChangeInfoMsg();
 
-        //º¯°æÇÒ ³» Á¤º¸ °¡Á®¿À±â
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         string name = GameObject.Find("Text_Name").GetComponent<InputField>().text;
         float positionX = float.Parse(GameObject.Find("Text_Position_X").GetComponent<InputField>().text);
         float positionY = float.Parse(GameObject.Find("Text_Position_Y").GetComponent<InputField>().text);
@@ -434,32 +434,32 @@ public class NetworkManager_Client : MonoBehaviour
         float[] QuaternionArray = { QuaternionX, QuaternionY, QuaternionZ, QuaternionW };
 
 
-        //¸Þ½ÃÁö ÀÛ¼º
+        //ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½Û¼ï¿½
         stChangeInfoMsgData.sendClientName = strRcvMyName;
-        stChangeInfoMsgData.MsgID = 1;//¸Þ½ÃÁö ID
-        stChangeInfoMsgData.PacketSize = (ushort)Marshal.SizeOf(stChangeInfoMsgData);//¸Þ½ÃÁö Å©±â
+        stChangeInfoMsgData.MsgID = 1;//ï¿½Þ½ï¿½ï¿½ï¿½ ID
+        stChangeInfoMsgData.PacketSize = (ushort)Marshal.SizeOf(stChangeInfoMsgData);//ï¿½Þ½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
         stChangeInfoMsgData.strClientName = name;
         stChangeInfoMsgData.position = positionArray;
         stChangeInfoMsgData.Quaternion = QuaternionArray;
 
-        //±¸Á¶Ã¼ ¹ÙÀÌÆ®È­ ¹× Àü¼Û
+        //ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½Æ®È­ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         SendMsg(GetChangeInfoMsgToByte(stChangeInfoMsgData));
 
         strRcvMyName = name;
     }
 
     /// <summary>
-    /// ¸Å°³º¯¼ö ¸Þ½ÃÁö º¸³»±â
+    /// ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     private void SendMsg(byte[] message)
     {
-        //¿¬°á»óÅÂ°¡ ¾Æ´Ñ °æ¿ì
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â°ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½
         if (socketConnection == null)
         {
             return;
         }
 
-        //Àü¼Û
+        //ï¿½ï¿½ï¿½ï¿½
         stream.Write(message,0, message.Length);
         stream.Flush();
     }
